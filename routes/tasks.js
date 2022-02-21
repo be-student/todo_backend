@@ -57,6 +57,7 @@ router.delete("/:id", async (req, res) => {
     return res.status(200).json({ result: "success" });
   } catch (error) {
     console.error(error);
+    z``;
     return res.status(505).json({ result: "failure", error: "server problem" });
   }
 });

@@ -4,12 +4,16 @@ import morgan from "morgan";
 import { sequelize } from "./models/index.js";
 import taskRouter from "./routes/tasks.js";
 import hashtagRouter from "./routes/hashtags.js";
+import authRouter from "./routes/auth.js";
+import session from "express-session";
 import { config } from "dotenv";
 import cors from "cors";
+import passport from "passport";
 import cookieParser from "cookie-parser";
+import passportConfig from "./passport/index.js";
 
 config();
-
+passportConfig();
 import sanitizeHtml from "sanitize-html";
 //import csurf from "csurf";
 //const csurfProtection = csurf({ cookie: true });
@@ -20,7 +24,7 @@ const __dirname = path.resolve();
 const app = express();
 
 app.use(cors());
-app.set("port", process.env.PORT || 80);
+app.set("port", process.env.PORT || 8001);
 sequelize
   .sync({ force: false })
   .then(() => {
@@ -45,11 +49,26 @@ app.use(function (req, res, next) {
   );
   return next();
 });
-//app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.COOKIE_SECRET,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+    },
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use("/", express.static(path.join(__dirname, "/build")));
 app.use("/", express.static(path.join(__dirname, "/build/static")));
 app.use("/tasks", taskRouter);
 app.use("/hashtags", hashtagRouter);
+app.use("/auth", authRouter);
 
 app.use((req, res, next) => {
   const error = new Error(`${req.method} ${req.url} no router.`);
@@ -63,7 +82,10 @@ app.use((err, req, res, next) => {
   res.locals.message = err.message;
   res.locals.error = process.env.NODE_ENV !== "production" ? err : {};
   res.status(err.status || 500);
-  res.render("error");
+  if (err.message) {
+    return res.json({ result: "failure", message: err.message });
+  }
+  return res.json({ result: "failure", error: "unknown problem" });
 });
 
 app.listen(app.get("port"), () => {

@@ -2,6 +2,7 @@ import Sequelize from "sequelize";
 import Task from "./tasks.js";
 import { createRequire } from "module";
 import Hashtag from "./hashtags.js";
+import User from "./user.js";
 const require = createRequire(import.meta.url);
 const env = process.env.NODE_ENV || "development";
 // import * as con from "../config/config.json";
@@ -23,10 +24,13 @@ db.sequelize = sequelize;
 
 db.Hashtag = Hashtag;
 db.Task = Task;
+db.User = User;
 
+User.init(sequelize);
 Hashtag.init(sequelize);
 Task.init(sequelize);
 
+User.associate(db);
 Hashtag.assciate(db);
 Task.associate(db);
 

@@ -26,3 +26,7 @@ json 형식으로 보내면 수정 또는 생성이 가능합니다.
 1~3자리 R
 4~6자리 G
 7~9자리 B 입니다.
+
+로그인 세팅
+/auth/regiseter
+/auth/login
