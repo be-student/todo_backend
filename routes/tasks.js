@@ -1,6 +1,7 @@
 import express from "express";
 import Task from "../models/tasks.js";
 import Hashtag from "../models/hashtags.js";
+import User from "../models/user.js";
 import moment from "moment";
 import { Op } from "sequelize";
 import { makeHashtag, postIsValid } from "../func/function.js";
@@ -10,10 +11,11 @@ import {
   saveHashtag,
   taskIsValid,
 } from "../func/function.js";
+import { isLoggedIn } from "./middlewares.js";
 moment.tz.setDefault("Asia/Seoul");
 const router = express.Router();
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", isLoggedIn, async (req, res) => {
   try {
     const task = await Task.findOne({ where: { id: req.params.id } });
     if (!task) {
@@ -28,24 +30,30 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", isLoggedIn, async (req, res) => {
   if (postIsValid(req.body, res)) {
     return;
   }
   modifyData(req.body);
   try {
+    console.log(req.user.dataValues.id);
+    const user = User.findOne({ where: { id: req.user.dataValues.id } });
+    if (!user) {
+      return res.status(400).json({ result: "failure", error: "unknown user" });
+    }
     const task = await Task.create({
       ...req.body,
       createdAt: moment(),
     });
-    await makeHashtag(task, req.body, res);
+    await makeHashtag(task, user, req.body, res);
+
     return res.status(200).send(req.body);
   } catch (error) {
     console.error(error);
     return res.status(505).json({ result: "failure", error: "server problem" });
   }
 });
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isLoggedIn, async (req, res) => {
   try {
     const post = await Task.findOne({ where: { id: req.params.id } });
     if (!post) {
@@ -62,7 +70,8 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", isLoggedIn, async (req, res) => {
+  console.log(req.user.dataValues.id);
   try {
     let tasks = await Task.findAll();
     return res.status(200).json(tasks);
@@ -72,7 +81,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/nearness", async (req, res) => {
+router.get("/nearness", isLoggedIn, async (req, res) => {
   console.log("nearness");
   try {
     const nearTask = await Task.findAll({
@@ -92,7 +101,7 @@ router.get("/nearness", async (req, res) => {
     return res.status(505).json({ result: "failure", error: "server problem" });
   }
 });
-router.get("/:id", async (req, res) => {
+router.get("/:id", isLoggedIn, async (req, res) => {
   try {
     const post = await Task.findOne({ where: { id: req.params.id } });
     if (!post) {

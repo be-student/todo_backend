@@ -1,7 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import passport from "passport";
-import { isNotLoggedIn, isLoggedIn, verifyToken } from "./middlewares.js";
+import { isNotLoggedIn, isLoggedIn } from "./middlewares.js";
 import User from "../models/user.js";
 
 const router = express.Router();

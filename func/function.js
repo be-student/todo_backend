@@ -77,7 +77,7 @@ export const postIsValid = (data, res) => {
     //   return true;
   }
 };
-export const makeHashtag = async (task, data, res) => {
+export const makeHashtag = async (task, user, data, res) => {
   const hashtagset = new Set(data.description.match(/#[^\s#]*/g));
   const hashtags = [...hashtagset];
   for (const i in hashtags) {
@@ -88,6 +88,9 @@ export const makeHashtag = async (task, data, res) => {
     try {
       const result = await saveHashtag(hashtags);
       await task.addHashtags(result);
+      await user.addTask(task);
+      console.log(task);
+      await user.addHashtags(result);
     } catch (error) {
       console.error(error);
       return res

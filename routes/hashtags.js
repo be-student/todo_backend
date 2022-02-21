@@ -1,10 +1,11 @@
 import express from "express";
 import Hashtag from "../models/hashtags.js";
 import Task from "../models/tasks.js";
+import { isLoggedIn } from "./middlewares.js";
 
 const router = express.Router();
 
-router.get("/:name", async (req, res) => {
+router.get("/:name", isLoggedIn, async (req, res) => {
   const targetName = decodeURIComponent(req.params.name);
   console.log(targetName);
   try {
@@ -17,7 +18,7 @@ router.get("/:name", async (req, res) => {
     console.error(error);
   }
 });
-router.get("/", async (req, res) => {
+router.get("/", isLoggedIn, async (req, res) => {
   try {
     const target = await Hashtag.findAll();
     res.status(200).json(target);
@@ -26,7 +27,7 @@ router.get("/", async (req, res) => {
     res.status(500).json({ result: "failure", error: "server problem" });
   }
 });
-router.delete("/:name", async (req, res) => {
+router.delete("/:name", isLoggedIn, async (req, res) => {
   const targetName = decodeURIComponent(req.params.name);
   console.log(targetName);
   try {
