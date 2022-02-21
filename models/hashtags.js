@@ -37,6 +37,7 @@ class Hashtag extends Sequelize.Model {
   }
   static assciate(db) {
     db.Hashtag.belongsToMany(db.Task, { through: "TaskHashtag" });
+    db.Hashtag.belongsTo(db.User, { foreignKey: "id" });
   }
 }
 export default Hashtag;
