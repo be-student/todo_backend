@@ -56,7 +56,7 @@ router.get("/kakao", passport.authenticate("kakao"));
 
 router.get(
   "/kakao/callback",
-  passport.authenticate("kakao", {
+  passport.authenticate("kakao", {  
     failureRedirect: "/",
   }),
   (req, res) => {
