@@ -40,7 +40,7 @@ router.delete("/:name", isLoggedIn, async (req, res) => {
       ],
     });
     if (result.Tasks.length === 0) {
-      await Hashtag.destroy({ where: { name: targetName } });
+      await User.removeHashtag(result);
     }
     return res.status(200).json(result);
   } catch (error) {
