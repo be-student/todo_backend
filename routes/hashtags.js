@@ -7,10 +7,10 @@ const router = express.Router();
 
 router.get("/:name", isLoggedIn, async (req, res) => {
   const targetName = decodeURIComponent(req.params.name);
-  console.log(targetName);
   try {
     const result = await Hashtag.findOne({
       where: { name: targetName },
+      UserId: req.user.id,
       include: Task,
     });
     return res.status(200).json(result);
@@ -20,7 +20,7 @@ router.get("/:name", isLoggedIn, async (req, res) => {
 });
 router.get("/", isLoggedIn, async (req, res) => {
   try {
-    const target = await Hashtag.findAll();
+    const target = await Hashtag.findAll({ where: { UserId: req.user.id } });
     res.status(200).json(target);
   } catch (error) {
     console.error(error);
@@ -32,7 +32,7 @@ router.delete("/:name", isLoggedIn, async (req, res) => {
   console.log(targetName);
   try {
     const result = await Hashtag.findOne({
-      where: { name: targetName },
+      where: { name: targetName, UserId: req.user.id },
       include: [
         {
           model: Task,

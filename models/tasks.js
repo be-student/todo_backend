@@ -49,7 +49,7 @@ class Task extends Sequelize.Model {
 
   static associate(db) {
     db.Task.belongsToMany(db.Hashtag, { through: "TaskHashtag" });
-    db.Task.belongsTo(db.User, { foreignKey: "id" });
+    db.Task.belongsTo(db.User);
   }
 }
 export default Task;

@@ -23,7 +23,13 @@ import hpp from "hpp";
 const __dirname = path.resolve();
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+  })
+);
 app.set("port", process.env.PORT || 8001);
 sequelize
   .sync({ force: false })

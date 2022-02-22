@@ -8,7 +8,7 @@ export const genColor = () => {
   result += Math.floor(Math.random() * 256);
   return result;
 };
-export const saveHashtag = async (hashtagSet) => {
+export const saveHashtag = async (hashtagSet, user) => {
   let result = [];
   for (const tag of hashtagSet) {
     let extag = await Hashtag.findOne({ where: { name: tag } });
@@ -18,6 +18,7 @@ export const saveHashtag = async (hashtagSet) => {
         wordColor: genColor(),
         backgroundColor: genColor(),
         createdAt: moment(),
+        UserId: user.dataValues.id,
       });
     }
     result.push(extag);
@@ -62,19 +63,20 @@ export const postIsValid = (data, res) => {
     return true;
   }
   if (data.targetDate !== undefined) {
-    if (!moment(data.targetDate, "YYYY-MM-DD HH:mm", true).isValid()) {
-      console.log("1234");
+    // if (!moment(data.targetDate, "YYYY-MM-DD HH:mm", true).isValid()) {
+    //   console.log("1234");
+    //   res
+    //     .status(404)
+    //     .json({ result: "failure", error: "날짜 형식이 잘못 되었습니다." });
+    //   return true;
+    // }
+    const regex = /^([\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2})$/;
+    if (regex.test(data.targetDate) === false) {
       res
         .status(404)
         .json({ result: "failure", error: "날짜 형식이 잘못 되었습니다." });
       return true;
     }
-    //const regex = /^([\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2})$/;
-    // if (regex.test(data.targetDate) === false||moment()) {
-    //   res
-    //     .status(404)
-    //     .json({ result: "failure", error: "날짜 형식이 잘못 되었습니다." });
-    //   return true;
   }
 };
 export const makeHashtag = async (task, user, data, res) => {
@@ -86,7 +88,7 @@ export const makeHashtag = async (task, user, data, res) => {
   console.log(hashtags.length);
   if (hashtags.length !== 0) {
     try {
-      const result = await saveHashtag(hashtags);
+      const result = await saveHashtag(hashtags, user);
       await task.addHashtags(result);
       await user.addTask(task);
       console.log(task);
@@ -112,14 +114,14 @@ export const putIsValid = (data) => {
     }
   }
 };
-export const putTask = async (task, data, res) => {
+export const putTask = async (task, user, data, res) => {
   //1. title, 2. description(hashtag). 3. clear(finishedAt) 4. targetDate
   if (putIsValid(data)) {
     return;
   }
   modifyData(data);
   data.editedAt = moment();
-  task.dataValues = { ...task.dataValues, ...data };
+  task.dataValues = { ...task.dataValues, ...data, UserId: user.dataValues.id };
   try {
     const temptask = await Task.create(task.dataValues);
     if (makeHashtag(temptask, data, res) === true) {

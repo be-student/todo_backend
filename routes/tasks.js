@@ -17,6 +17,10 @@ const router = express.Router();
 
 router.put("/:id", isLoggedIn, async (req, res) => {
   try {
+    const user = await User.findOne({ where: { id: req.user.dataValues.id } });
+    if (!user) {
+      return res.status(400).json({ result: "failure", error: "unknown user" });
+    }
     const task = await Task.findOne({ where: { id: req.params.id } });
     if (!task) {
       return res
@@ -24,7 +28,7 @@ router.put("/:id", isLoggedIn, async (req, res) => {
         .json({ result: "failure", error: "you choosed wrong task" });
     }
     await task.destroy();
-    await putTask(task, req.body, res);
+    await putTask(task, user, req.body, res);
   } catch (error) {
     return res.status(505).json({ result: "failure", error: "server problem" });
   }
@@ -36,14 +40,16 @@ router.post("/", isLoggedIn, async (req, res) => {
   }
   modifyData(req.body);
   try {
-    console.log(req.user.dataValues.id);
-    const user = User.findOne({ where: { id: req.user.dataValues.id } });
+    const user = await User.findOne({ where: { id: req.user.dataValues.id } });
+    console.log(user.dataValues.id);
+
     if (!user) {
       return res.status(400).json({ result: "failure", error: "unknown user" });
     }
     const task = await Task.create({
       ...req.body,
       createdAt: moment(),
+      UserId: user.dataValues.id,
     });
     await makeHashtag(task, user, req.body, res);
 
@@ -71,9 +77,8 @@ router.delete("/:id", isLoggedIn, async (req, res) => {
 });
 
 router.get("/", isLoggedIn, async (req, res) => {
-  console.log(req.user.dataValues.id);
   try {
-    let tasks = await Task.findAll();
+    let tasks = await Task.findAll({ where: { UserId: req.user.id } });
     return res.status(200).json(tasks);
   } catch (error) {
     console.error(error);
@@ -86,6 +91,7 @@ router.get("/nearness", isLoggedIn, async (req, res) => {
   try {
     const nearTask = await Task.findAll({
       where: {
+        UserId: req.user.id,
         targetDate: {
           [Op.and]: {
             [Op.lte]: moment().add(3, "days").toDate(),
@@ -103,7 +109,9 @@ router.get("/nearness", isLoggedIn, async (req, res) => {
 });
 router.get("/:id", isLoggedIn, async (req, res) => {
   try {
-    const post = await Task.findOne({ where: { id: req.params.id } });
+    const post = await Task.findOne({
+      where: { id: req.params.id, UserId: req.user.id },
+    });
     if (!post) {
       return res
         .status(404)
