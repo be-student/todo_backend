@@ -7,7 +7,6 @@ class Hashtag extends Sequelize.Model {
         name: {
           type: Sequelize.STRING(45),
           allowNull: false,
-          unique: true,
         },
         wordColor: {
           type: Sequelize.INTEGER,

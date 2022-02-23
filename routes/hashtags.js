@@ -1,6 +1,7 @@
 import express from "express";
 import Hashtag from "../models/hashtags.js";
 import Task from "../models/tasks.js";
+import User from "../models/user.js";
 import { isLoggedIn } from "./middlewares.js";
 
 const router = express.Router();
@@ -31,6 +32,7 @@ router.delete("/:name", isLoggedIn, async (req, res) => {
   const targetName = decodeURIComponent(req.params.name);
   console.log(targetName);
   try {
+    const user = await User.findOne({ where: { id: req.user.id } });
     const result = await Hashtag.findOne({
       where: { name: targetName, UserId: req.user.id },
       include: [
@@ -40,7 +42,7 @@ router.delete("/:name", isLoggedIn, async (req, res) => {
       ],
     });
     if (result.Tasks.length === 0) {
-      await User.removeHashtag(result);
+      await user.removeHashtag(result);
     }
     return res.status(200).json(result);
   } catch (error) {

@@ -47,9 +47,13 @@ export const modifyData = (data) => {
       }
     }
     if (key === "targetDate") {
-      data.targetDate = new Date(
-        moment(data.targetDate, "YYYY-MM-DD hh:mm")
-      ).toUTCString();
+      if (data.targetDate === "") {
+        delete data.targetDate;
+      } else {
+        data.targetDate = new Date(
+          moment(data.targetDate, "YYYY-MM-DD hh:mm")
+        ).toUTCString();
+      }
     }
   }
 };
@@ -62,7 +66,7 @@ export const postIsValid = (data, res) => {
     res.status(404).json({ result: "failure", error: "enter description" });
     return true;
   }
-  if (data.targetDate !== undefined) {
+  if (data.targetDate !== "") {
     // if (!moment(data.targetDate, "YYYY-MM-DD HH:mm", true).isValid()) {
     //   console.log("1234");
     //   res
@@ -105,7 +109,7 @@ export const makeHashtag = async (task, user, data, res) => {
 };
 export const putIsValid = (data) => {
   const regex = /^([\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2})$/;
-  if (data.targetDate !== undefined) {
+  if (data.targetDate !== "") {
     if (regex.test(data.targetDate) === false) {
       res
         .status(404)

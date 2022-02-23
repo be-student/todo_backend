@@ -26,7 +26,6 @@ router.post("/join", isNotLoggedIn, async (req, res, next) => {
   }
 });
 router.post("/login", isNotLoggedIn, async (req, res, next) => {
-  console.log(req.body);
   passport.authenticate("local", (authError, user, info) => {
     if (authError) {
       console.error(authError);
@@ -46,7 +45,6 @@ router.post("/login", isNotLoggedIn, async (req, res, next) => {
 });
 
 router.get("/logout", isLoggedIn, (req, res) => {
-  console.log(req.user);
   req.logout();
   req.session.destroy();
   res.redirect("/");
@@ -56,12 +54,14 @@ router.get("/kakao", passport.authenticate("kakao"));
 
 router.get(
   "/kakao/callback",
-  passport.authenticate("kakao", {  
+  passport.authenticate("kakao", {
     failureRedirect: "/",
   }),
   (req, res) => {
     res.redirect("/");
   }
 );
-
+router.get("/check", isLoggedIn, (req, res) => {
+  res.status(200).json({ result: "success" });
+});
 export default router;

@@ -76,11 +76,12 @@ router.delete("/:id", isLoggedIn, async (req, res) => {
   }
 });
 
-router.get("/", isLoggedIn, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     let tasks = await Task.findAll({ where: { UserId: req.user.id } });
     return res.status(200).json(tasks);
   } catch (error) {
+    console.log("error");
     console.error(error);
     return res.status(505).json({ result: "failure", error: "server problem" });
   }
@@ -100,7 +101,7 @@ router.get("/nearness", isLoggedIn, async (req, res) => {
         },
       },
     });
-
+    console.log(nearTask);
     return res.status(200).json(nearTask);
   } catch (error) {
     console.error(error);
