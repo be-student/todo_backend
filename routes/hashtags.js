@@ -6,6 +6,7 @@ import { isLoggedIn } from "./middlewares.js";
 
 const router = express.Router();
 
+
 router.get("/:name", isLoggedIn, async (req, res) => {
   const targetName = decodeURIComponent(req.params.name);
   try {

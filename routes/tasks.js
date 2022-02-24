@@ -15,13 +15,17 @@ import { isLoggedIn } from "./middlewares.js";
 moment.tz.setDefault("Asia/Seoul");
 const router = express.Router();
 
+//problem
 router.put("/:id", isLoggedIn, async (req, res) => {
+  console.log(req.body);
   try {
     const user = await User.findOne({ where: { id: req.user.dataValues.id } });
     if (!user) {
       return res.status(400).json({ result: "failure", error: "unknown user" });
     }
-    const task = await Task.findOne({ where: { id: req.params.id } });
+    const task = await Task.findOne({
+      where: { id: req.params.id, UserId: req.user.dataValues.id },
+    });
     if (!task) {
       return res
         .status(404)
@@ -34,6 +38,7 @@ router.put("/:id", isLoggedIn, async (req, res) => {
   }
 });
 
+//problem
 router.post("/", isLoggedIn, async (req, res) => {
   if (postIsValid(req.body, res)) {
     return;

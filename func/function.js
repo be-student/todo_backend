@@ -1,6 +1,7 @@
 import moment from "moment";
 import Hashtag from "../models/hashtags.js";
 import Task from "../models/tasks.js";
+import User from "../models/user.js";
 
 export const genColor = () => {
   let result = Math.floor(Math.random() * 256) * 1000 * 1000;
@@ -84,6 +85,7 @@ export const postIsValid = (data, res) => {
   }
 };
 export const makeHashtag = async (task, user, data, res) => {
+  console.log(data);
   const hashtagset = new Set(data.description.match(/#[^\s#]*/g));
   const hashtags = [...hashtagset];
   for (const i in hashtags) {
@@ -124,11 +126,12 @@ export const putTask = async (task, user, data, res) => {
     return;
   }
   modifyData(data);
+  console.log(data);
   data.editedAt = moment();
   task.dataValues = { ...task.dataValues, ...data, UserId: user.dataValues.id };
   try {
     const temptask = await Task.create(task.dataValues);
-    if (makeHashtag(temptask, data, res) === true) {
+    if (makeHashtag(temptask, user, data, res) === true) {
       return;
     }
     return res.status(200).json(temptask);
