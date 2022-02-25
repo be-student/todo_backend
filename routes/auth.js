@@ -7,6 +7,7 @@ import User from "../models/user.js";
 const router = express.Router();
 // router.get("/", verifyToken);
 router.post("/join", isNotLoggedIn, async (req, res, next) => {
+  console.log(req.body);
   const { email, nick, password } = req.body;
   try {
     const exUser = await User.findOne({ where: { email } });
@@ -26,6 +27,7 @@ router.post("/join", isNotLoggedIn, async (req, res, next) => {
   }
 });
 router.post("/login", isNotLoggedIn, async (req, res, next) => {
+  console.log(req.body);
   passport.authenticate("local", (authError, user, info) => {
     if (authError) {
       console.error(authError);

@@ -81,7 +81,7 @@ router.delete("/:id", isLoggedIn, async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", isLoggedIn, async (req, res) => {
   try {
     let tasks = await Task.findAll({ where: { UserId: req.user.id } });
     return res.status(200).json(tasks);
