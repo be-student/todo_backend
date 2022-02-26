@@ -12,7 +12,9 @@ router.post("/join", isNotLoggedIn, async (req, res, next) => {
   try {
     const exUser = await User.findOne({ where: { email } });
     if (exUser) {
-      return res.json({ result: "failure", error: "already exists" });
+      return res
+        .status(404)
+        .json({ result: "failure", error: "already exists" });
     }
     const hash = await bcrypt.hash(password, 12);
     await User.create({
@@ -34,7 +36,7 @@ router.post("/login", isNotLoggedIn, async (req, res, next) => {
       return next(authError);
     }
     if (!user) {
-      return res.json({ result: "failure", error: info.message });
+      return res.status(404).json({ result: "failure", error: info.message });
     }
     return req.login(user, (loginError) => {
       if (loginError) {
