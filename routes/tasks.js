@@ -82,8 +82,16 @@ router.delete("/:id", isLoggedIn, async (req, res) => {
 });
 
 router.get("/", isLoggedIn, async (req, res) => {
+  const query = req.query;
+  console.log(query);
+  const limit = query.limit ? +query.limit : 4;
+  const offset = query.page ? (+query.page - 1) * limit : 0;
   try {
-    let tasks = await Task.findAll({ where: { UserId: req.user.id } });
+    const tasks = await Task.findAndCountAll({
+      where: { UserId: req.user.id },
+      offset: offset,
+      limit: limit,
+    });
     return res.status(200).json(tasks);
   } catch (error) {
     console.log("error");

@@ -6,7 +6,6 @@ import { isLoggedIn } from "./middlewares.js";
 
 const router = express.Router();
 
-
 router.get("/:name", isLoggedIn, async (req, res) => {
   const targetName = decodeURIComponent(req.params.name);
   try {
@@ -21,8 +20,15 @@ router.get("/:name", isLoggedIn, async (req, res) => {
   }
 });
 router.get("/", isLoggedIn, async (req, res) => {
+  const query = req.query;
+  const limit = query.limit ? query.limit : 4;
+  const offset = query.page ? (query.page - 1) * limit : 0;
   try {
-    const target = await Hashtag.findAll({ where: { UserId: req.user.id } });
+    const target = await Hashtag.findAll({
+      where: { UserId: req.user.id },
+      offset: offset,
+      limit: limit,
+    });
     res.status(200).json(target);
   } catch (error) {
     console.error(error);

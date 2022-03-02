@@ -1,13 +1,13 @@
 import Sequelize from "sequelize";
 import Task from "./tasks.js";
-import { createRequire } from "module";
+
 import Hashtag from "./hashtags.js";
 import User from "./user.js";
-const require = createRequire(import.meta.url);
 const env = process.env.NODE_ENV || "development";
 // import * as con from "../config/config.json";
 // const config = con.env;
 import * as con from "../config/config.js";
+console.log("123412341234\n\n\n");
 console.dir(con.default);
 console.log(env);
 const config = con.default[env];
@@ -35,3 +35,5 @@ Hashtag.assciate(db);
 Task.associate(db);
 
 export default db;
+// import { createRequire } from "module";
+// const require = createRequire(import.meta.url);

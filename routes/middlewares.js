@@ -1,4 +1,3 @@
-import Jwt from "jsonwebtoken";
 export const isNotLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
     next();

@@ -57,6 +57,7 @@ export const modifyData = (data) => {
       }
     }
   }
+  return data;
 };
 export const postIsValid = (data, res) => {
   if (!data.title) {
@@ -83,6 +84,7 @@ export const postIsValid = (data, res) => {
       return true;
     }
   }
+  return false;
 };
 export const makeHashtag = async (task, user, data, res) => {
   console.log(data);
@@ -109,7 +111,7 @@ export const makeHashtag = async (task, user, data, res) => {
     return false;
   }
 };
-export const putIsValid = (data) => {
+export const putIsValid = (data, res) => {
   const regex = /^([\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2})$/;
   if (data.targetDate !== "") {
     if (regex.test(data.targetDate) === false) {
@@ -122,7 +124,7 @@ export const putIsValid = (data) => {
 };
 export const putTask = async (task, user, data, res) => {
   //1. title, 2. description(hashtag). 3. clear(finishedAt) 4. targetDate
-  if (putIsValid(data)) {
+  if (putIsValid(data, res)) {
     return;
   }
   modifyData(data);

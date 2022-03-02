@@ -68,4 +68,7 @@ router.get(
 router.get("/check", isLoggedIn, (req, res) => {
   res.status(200).json({ result: "success" });
 });
+router.get("/:id", (req, res) => {
+  console.log(req.query);
+});
 export default router;
