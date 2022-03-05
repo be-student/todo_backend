@@ -83,7 +83,6 @@ router.delete("/:id", isLoggedIn, async (req, res) => {
 
 router.get("/", isLoggedIn, async (req, res) => {
   const query = req.query;
-  console.log(query);
   const limit = query.limit ? +query.limit : 4;
   const offset = query.page ? (+query.page - 1) * limit : 0;
   try {
@@ -101,9 +100,12 @@ router.get("/", isLoggedIn, async (req, res) => {
 });
 
 router.get("/nearness", isLoggedIn, async (req, res) => {
-  console.log("nearness");
+  const query = req.query;
+  const limit = query.limit ? +query.limit : 4;
+  const offset = query.page ? (+query.page - 1) * limit : 0;
+  console.log(query, limit, offset);
   try {
-    const nearTask = await Task.findAll({
+    const nearTask = await Task.findAndCountAll({
       where: {
         UserId: req.user.id,
         targetDate: {
@@ -113,11 +115,13 @@ router.get("/nearness", isLoggedIn, async (req, res) => {
           },
         },
       },
+      offset: offset,
+      limit: limit,
     });
     console.log(nearTask);
     return res.status(200).json(nearTask);
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     return res.status(505).json({ result: "failure", error: "server problem" });
   }
 });
